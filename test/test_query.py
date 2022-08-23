@@ -9,7 +9,7 @@ standard_library.install_aliases()
 from builtins import *
 import unittest
 from whois import whois
-
+from whois.exceptions import DomainNotFoundError, WhoisServerNotFoundError
 
 class TestQuery(unittest.TestCase):
     def test_simple_ascii_domain(self):
@@ -23,6 +23,17 @@ class TestQuery(unittest.TestCase):
     def test_unicode_domain_and_tld(self):
         domain = 'россия.рф'
         whois(domain)
+
+    def test_tld_missing_domain(self):
+        domain = "improbablylongandunlikelytoactuallyberegistereddomain.com"
+        with self.assertRaises(DomainNotFoundError):
+            whois(domain)
+
+    @unittest.skip("need a better way to legitimately trigger this condition")
+    def test_tld_missing_whois_server(self):
+        domain = "nothinghere.blanco"
+        with self.assertRaises(WhoisServerNotFoundError):
+            whois(domain)
 
     def test_ipv4(self):
         """ Verify ipv4 addresses. """
